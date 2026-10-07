@@ -1,0 +1,100 @@
+{% extends 'expenses/base.html' %}
+
+{% block title %}Dashboard | VaultTracker{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Header & Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Card 1: Total Spent -->
+        <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-lg">
+            <p class="text-sm text-slate-400 font-medium">Total Spent</p>
+            <h2 class="text-3xl font-bold text-slate-100 mt-2">${{ total_spent|floatformat:2 }}</h2>
+        </div>
+
+        <!-- Card 2: Quick Action -->
+        <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-lg flex flex-col justify-between">
+            <p class="text-sm text-slate-400 font-medium">Quick Actions</p>
+            <a href="{% url 'add_expense' %}" class="mt-2 inline-block text-center bg-indigo-600 hover:bg-indigo-500 font-semibold py-2 px-4 rounded-xl transition">
+                + Add Expense
+            </a>
+            <a href="{% url 'manage_categories' %}" class="flex-1 text-center bg-slate-700 hover:bg-slate-600 font-semibold py-2 px-3 rounded-xl text-sm border border-slate-600 transition">
+            ⚙️ Set Budgets
+            </a>
+        </div>
+    </div>
+
+    <!-- Budget Progress Section -->
+    <div class="bg-slate-800 rounded-2xl border border-slate-700 p-6 shadow-lg">
+        <h3 class="text-lg font-bold mb-4 text-slate-200">Category Budgets</h3>
+        
+        {% if category_progress %}
+            <div class="space-y-4">
+                {% for item in category_progress %}
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="font-semibold text-slate-200">{{ item.name }}</span>
+                            <span class="text-slate-400">
+                                ${{ item.spent|floatformat:2 }} / 
+                                {% if item.budget > 0 %}
+                                    ${{ item.budget|floatformat:2 }} ({{ item.percentage }}%)
+                                {% else %}
+                                    No Budget Set
+                                {% endif %}
+                            </span>
+                        </div>
+                        
+                       <!-- Progress Bar Container -->
+                       <div class="w-full bg-slate-700 rounded-full h-3 overflow-hidden">
+                            {% if item.percentage >= 100 %}
+                                <div class="bg-red-500 h-3 rounded-full transition-all duration-500" style="width: {{ item.percentage }}%;"></div>
+                            {% elif item.percentage >= 80 %}
+                                <div class="bg-amber-500 h-3 rounded-full transition-all duration-500" style="width: {{ item.percentage }}%;"></div>
+                            {% else %}
+                                <div class="bg-indigo-500 h-3 rounded-full transition-all duration-500" style="width: {{ item.percentage }}%;"></div>
+                            {% endif %}
+                       </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-slate-400 text-sm">No categories found.</p>
+        {% endif %}
+    </div>
+
+    <!-- Recent Transactions Table -->
+    <div class="bg-slate-800 rounded-2xl border border-slate-700 p-6 shadow-lg">
+        <h3 class="text-lg font-bold mb-4 text-slate-200">Recent Transactions</h3>
+        
+        {% if recent_expenses %}
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-slate-300">
+                    <thead class="text-xs uppercase bg-slate-700/50 text-slate-400">
+                        <tr>
+                            <th class="py-3 px-4 rounded-l-lg">Category</th>
+                            <th class="py-3 px-4">Date</th>
+                            <th class="py-3 px-4">Note</th>
+                            <th class="py-3 px-4 text-right rounded-r-lg">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-700/50">
+                        {% for expense in recent_expenses %}
+                            <tr class="hover:bg-slate-750">
+                                <td class="py-3 px-4 font-semibold text-slate-100">{{ expense.category.name }}</td>
+                                <td class="py-3 px-4 text-slate-400">{{ expense.date }}</td>
+                                <td class="py-3 px-4 text-slate-400">{{ expense.note|default:"—" }}</td>
+                                <td class="py-3 px-4 text-right font-bold text-red-400">-${{ expense.amount }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-slate-400 text-sm">No expenses recorded yet.</p>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}
+

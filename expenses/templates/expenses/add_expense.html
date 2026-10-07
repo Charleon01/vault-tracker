@@ -1,0 +1,42 @@
+{% extends 'expenses/base.html' %}
+
+{% block title %}Add Expense | VaultTracker{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-slate-800 p-8 rounded-2xl border border-slate-700 shadow-xl">
+    <h2 class="text-2xl font-bold mb-6 text-slate-100">Log New Expense</h2>
+
+    <form method="POST" class="space-y-5">
+        {% csrf_token %}
+
+        <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1">Category</label>
+            {{ form.category }}
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1">Amount ($)</label>
+            {{ form.amount }}
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1">Date</label>
+            {{ form.date }}
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1">Note (Optional)</label>
+            {{ form.note }}
+        </div>
+
+        <div class="flex items-center space-x-3 pt-3">
+            <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 px-4 rounded-xl transition">
+                Save Expense
+            </button>
+            <a href="{% url 'dashboard' %}" class="bg-slate-700 hover:bg-slate-600 text-slate-300 py-2.5 px-4 rounded-xl border border-slate-600 transition">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

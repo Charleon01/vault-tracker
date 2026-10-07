@@ -1,0 +1,51 @@
+{% extends 'expenses/base.html' %}
+
+{% block title %}Manage Budgets | VaultTracker{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-8">
+    
+    <!-- Add Category Form Card -->
+    <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
+        <h2 class="text-xl font-bold mb-4 text-slate-100">Add New Category & Budget</h2>
+        <form method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+            {% csrf_token %}
+            <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Category Name</label>
+                {{ form.name }}
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Monthly Budget ($)</label>
+                {{ form.monthly_budget }}
+            </div>
+            <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 px-4 rounded-xl transition h-10">
+                + Create Category
+            </button>
+        </form>
+    </div>
+
+    <!-- Existing Categories & Budgets List -->
+    <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
+        <h3 class="text-lg font-bold mb-4 text-slate-200">Your Active Categories</h3>
+        {% if categories %}
+            <div class="divide-y divide-slate-700">
+                {% for cat in categories %}
+                    <div class="py-3 flex justify-between items-center text-sm">
+                        <span class="font-semibold text-slate-100">{{ cat.name }}</span>
+                        <span class="text-indigo-400 font-medium">Budget: ${{ cat.monthly_budget|floatformat:2 }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-slate-400 text-sm">No categories created yet.</p>
+        {% endif %}
+        
+        <div class="mt-6 pt-4 border-t border-slate-700">
+            <a href="{% url 'dashboard' %}" class="inline-block bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2 rounded-xl text-sm transition">
+                ← Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
