@@ -7,6 +7,8 @@ from .forms import ExpenseForm, CategoryForm
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from .forms import RegisterForm, ExpenseForm, CategoryForm
+from rest_framework import viewsets
+from .serializers import ExpenseSerializer
 
 
 
@@ -136,3 +138,7 @@ def manage_categories(request):
     })
 
 
+
+class ExpenseViewSet(viewsets.ModelViewSet):
+    queryset = Expense.objects.all()
+    serializer_class = ExpenseSerializer
