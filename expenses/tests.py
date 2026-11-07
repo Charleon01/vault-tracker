@@ -3,6 +3,9 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from datetime import date
 from expenses.models import Category, Expense
+from rest_framework.test import APITestCase
+from rest_framework import status
+
 
 class AuthenticationSecurityTests(TestCase):
     
@@ -53,3 +56,45 @@ class ExpenseModelTests(TestCase):
         self.assertEqual(expense.note, "Grocery shopping")
         self.assertEqual(expense.user, self.user)
         self.assertEqual(expense.category, self.category)
+
+class ExpenseAPITests(APITestCase):
+    def setUp(self):
+        # Create a test user, category, and sample expense matching your model schema
+        self.user = User.objects.create_user(username='apitestuser', password='password123')
+        self.category = Category.objects.create(
+            user=self.user,
+            name="Utilities",
+            type="expense",
+            monthly_budget=300.00
+        )
+        self.expense = Expense.objects.create(
+            user=self.user,
+            category=self.category,
+            amount=45.00,
+            date=date.today(),
+            note='Test Groceries'
+        )
+        
+    def test_get_expenses_list(self):
+        """Ensure we can retrieve the list of expenses via API."""
+        url = reverse('expense-list')  # Assumes router registration basename/name
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+ 
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['note'], 'Test Groceries')
+
+    def test_create_expense_authenticated(self):
+        """Ensure an authenticated user can successfully create a new expense (POST request)."""
+        self.client.login(username='apitestuser', password='password123')
+        url = reverse('expense-list')
+        data = {
+            'user': self.user.id,  # Include the user ID here
+            'category': self.category.id,
+            'amount': 15.00,
+            'date': str(date.today()),
+            'note': 'Transport'
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Expense.objects.count(), 2)

@@ -40,8 +40,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # Local Apps
     'expenses',
+    'drf_spectacular',
     'rest_framework',
 ]
+
+REST_FRAMEWORK = {
+    # ... your existing DRF settings ...
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
